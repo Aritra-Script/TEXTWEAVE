@@ -1,0 +1,39 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+*.out
+*.err
+
+# Temporary files / uploads
+uploads/
+tmp/
+*.tmp
+
+# IDE / editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Mac / Linux system files
+.DS_Store
+Thumbs.db
+
+# Docker
+*.dockerignore
+*.dockerfile
+*.swp

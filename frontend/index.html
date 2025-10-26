@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Handwriting to Text Converter</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>TextWeave</h2>
+      <p>Your Goto Solutions for OCR Text Reading</p>
+      <div class="file-upload">
+        <input type="file" id="fileInput" accept="image/*" />
+        <label for="fileInput">
+          <span id="fileLabel">📁 Drag & Drop or Click to Upload</span>
+        </label>
+      </div>
+
+      <!-- Display selected file -->
+      <div class="file-info" id="fileInfo" style="display: none">
+        <img id="filePreview" src="" alt="Preview" />
+        <span id="fileName"></span>
+        <button id="removeFile">Remove File</button>
+      </div>
+
+      <button class="convert-btn" onclick="convertText()">
+        Convert to Text
+      </button>
+
+      <h3>Extracted Text:</h3>
+      <textarea
+        id="output"
+        placeholder="OCR result will appear here..."
+        readonly
+      ></textarea>
+
+      <button class="convert-btn" onclick="downloadText()">
+        Download as TXT
+      </button>
+      <div style="height: 20px"></div>
+
+      <div class="footer">&copy; 2025 Aritra Chakraborty</div>
+      <div class="footer">&copy; 2025 Shubhomoy Sarkar</div>
+    </div>
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const fileLabel = document.getElementById("fileLabel");
+      const fileInfo = document.getElementById("fileInfo");
+      const filePreview = document.getElementById("filePreview");
+      const fileName = document.getElementById("fileName");
+      const removeFileBtn = document.getElementById("removeFile");
+      const output = document.getElementById("output");
+
+      let uploadedFile = null;
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+          alert("Please select an image file only!");
+          fileInput.value = "";
+          return;
+        }
+
+        uploadedFile = file;
+        filePreview.src = URL.createObjectURL(file);
+        fileName.textContent = file.name;
+        fileInfo.style.display = "flex";
+        fileLabel.textContent = `📁 ${file.name}`;
+        output.value = ""; // Clear previous OCR result
+      });
+
+      removeFileBtn.addEventListener("click", () => {
+        uploadedFile = null;
+        fileInput.value = "";
+        fileLabel.textContent = "📁 Drag & Drop or Click to Upload";
+        fileInfo.style.display = "none";
+        output.value = "";
+      });
+
+      async function convertText() {
+        if (!uploadedFile) {
+          alert("Please upload an image!");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", uploadedFile);
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/extract-text", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            alert("Error processing the file.");
+            return;
+          }
+
+          const data = await response.json();
+          output.value = data.extracted_text;
+        } catch (err) {
+          console.error(err);
+          output.value = "Failed to connect to backend.";
+        }
+      }
+
+      function downloadText() {
+        const text = output.value;
+        if (!text) {
+          alert("Nothing to download!");
+          return;
+        }
+        const blob = new Blob([text], { type: "text/plain" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${
+          uploadedFile ? uploadedFile.name : "extracted_text"
+        }.txt`;
+        link.click();
+      }
+    </script>
+  </body>
+</html>
