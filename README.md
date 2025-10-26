@@ -34,6 +34,40 @@ TextWeave/
 └── README.md
 
 ```
+```mermaid
+flowchart TD
+ subgraph OCR_Utils["ocr_utils Package"]
+        E1["preprocess.py - Resize & Enhance Image"]
+        E2["reader.py - EasyOCR Model"]
+        E3["postprocess.py - Clean Extracted Text"]
+  end
+ subgraph Backend["Flask Backend (.venv)"]
+        C["File Upload Handler (Flask)"]
+        B["Flask Backend API"]
+        D["uploads/ folder"]
+        E["ocr_utils Package"]
+        OCR_Utils
+        F["JSON Response"]
+  end
+ subgraph Model["EasyOCR Model (PyTorch)"]
+        G["Pretrained EasyOCR Weights (~400MB)"]
+  end
+ subgraph Environment["Environment Files"]
+        I[".env File - Config & Secrets"]
+        J[".venv - Installed Dependencies"]
+  end
+    A["User Interface (HTML/CSS/JS)"] -- Upload Image --> B
+    B -- "POST /extract-text" --> C
+    C -- Save Temp File --> D
+    C -- Call OCR Module --> E
+    E1 --> E2
+    E2 --> E3
+    E3 -- Return Text --> F
+    E2 -- OCR Processing --> G
+    F -- Display Extracted Text --> H["Result Section in Frontend"]
+    Backend -.-> I & J
+
+```
 
 ## Prerequisites
 
